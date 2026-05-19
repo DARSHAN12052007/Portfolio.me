@@ -68,23 +68,47 @@ if (heroPhoto) {
   };
 }
 
-// ===== CONTACT FORM =====
+// ===== CONTACT FORM (REAL SUBMISSION VIA AJAX) =====
 const form = document.getElementById('contactForm');
 const submitBtn = document.getElementById('submitBtn');
 form.addEventListener('submit', (e) => {
   e.preventDefault();
+  
   submitBtn.textContent = 'Sending...';
   submitBtn.disabled = true;
-  setTimeout(() => {
-    submitBtn.textContent = 'Message Sent';
-    submitBtn.style.background = '#059669';
+
+  const formData = new FormData(form);
+  const data = Object.fromEntries(formData);
+
+  fetch('https://formsubmit.co/ajax/sandipfulpagare07778@gmail.com', {
+    method: 'POST',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(data => {
+    submitBtn.textContent = 'Message Sent Successfully';
+    submitBtn.style.background = '#059669'; // Green success color
     form.reset();
     setTimeout(() => {
       submitBtn.textContent = 'Send Message';
       submitBtn.style.background = '';
       submitBtn.disabled = false;
-    }, 3000);
-  }, 1200);
+    }, 4000);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    submitBtn.textContent = 'Error! Try Again';
+    submitBtn.style.background = '#dc2626'; // Red error color
+    setTimeout(() => {
+      submitBtn.textContent = 'Send Message';
+      submitBtn.style.background = '';
+      submitBtn.disabled = false;
+    }, 4000);
+  });
 });
 
 // ===== HERO IMAGE LOAD =====
