@@ -68,70 +68,96 @@ if (heroPhoto) {
   };
 }
 
-// ===== CONTACT FORM — Web3Forms (secure, AJAX, spam-protected) =====
-const form = document.getElementById('contactForm');
-const submitBtn = document.getElementById('submitBtn');
+// ===== HERO IMAGE LOAD =====
+window.addEventListener('DOMContentLoaded', () => {
+  document.querySelector('.hero-text')?.classList.add('visible');
+  setTimeout(() => document.querySelector('.hero-image-wrap')?.classList.add('visible'), 200);
+});
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+// ===== CONTACT FORM — Web3Forms (works on ALL devices, ALL browsers) =====
+document.addEventListener('DOMContentLoaded', function () {
 
-  // Block bots that filled the honeypot checkbox
-  if (form.querySelector('[name="botcheck"]').checked) return;
+  var form = document.getElementById('contactForm');
+  var submitBtn = document.getElementById('submitBtn');
 
-  // Basic rate limiting — prevent double-clicks
-  if (submitBtn.disabled) return;
+  if (!form || !submitBtn) return; // safety check
 
-  submitBtn.textContent = 'Sending...';
-  submitBtn.disabled = true;
+  form.addEventListener('submit', function (e) {
+    e.preventDefault(); // stop page refresh
 
-  try {
-    const formData = new FormData(form);
-    const payload = Object.fromEntries(formData);
+    // Block honeypot bots
+    var botcheck = form.querySelector('[name="botcheck"]');
+    if (botcheck && botcheck.checked) return;
 
-    const response = await fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
+    // Prevent double submit
+    if (submitBtn.disabled) return;
 
-    const result = await response.json();
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
 
-    if (result.success) {
-      // Success state
-      submitBtn.textContent = 'Message Sent!';
-      submitBtn.style.background = '#059669';
-      submitBtn.style.color = '#fff';
-      form.reset();
-      setTimeout(() => {
+    // Collect form data
+    var data = {
+      access_key: 'e9af55ab-4516-424f-9469-13a4c75b2a26',
+      subject: 'New Portfolio Message \u2014 Darshan Fulpagar',
+      from_name: 'Portfolio Contact Form',
+      name: form.querySelector('[name="name"]').value,
+      email: form.querySelector('[name="email"]').value,
+      message: form.querySelector('[name="message"]').value
+    };
+
+    // Use XMLHttpRequest for maximum compatibility (works on ALL browsers)
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'https://api.web3forms.com/submit', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.setRequestHeader('Accept', 'application/json');
+
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState !== 4) return;
+
+      try {
+        var result = JSON.parse(xhr.responseText);
+        if (xhr.status === 200 && result.success) {
+          // SUCCESS
+          submitBtn.textContent = 'Message Sent!';
+          submitBtn.style.background = '#059669';
+          submitBtn.style.color = '#ffffff';
+          form.reset();
+          setTimeout(function () {
+            submitBtn.textContent = 'Send Message';
+            submitBtn.style.background = '';
+            submitBtn.style.color = '';
+            submitBtn.disabled = false;
+          }, 5000);
+        } else {
+          throw new Error('Failed');
+        }
+      } catch (err) {
+        // ERROR
+        submitBtn.textContent = 'Failed \u2014 Try Again';
+        submitBtn.style.background = '#dc2626';
+        submitBtn.style.color = '#ffffff';
+        submitBtn.disabled = false;
+        setTimeout(function () {
+          submitBtn.textContent = 'Send Message';
+          submitBtn.style.background = '';
+          submitBtn.style.color = '';
+        }, 5000);
+      }
+    };
+
+    xhr.onerror = function () {
+      submitBtn.textContent = 'Network Error \u2014 Try Again';
+      submitBtn.style.background = '#dc2626';
+      submitBtn.style.color = '#ffffff';
+      submitBtn.disabled = false;
+      setTimeout(function () {
         submitBtn.textContent = 'Send Message';
         submitBtn.style.background = '';
         submitBtn.style.color = '';
-        submitBtn.disabled = false;
       }, 5000);
-    } else {
-      throw new Error(result.message || 'Submission failed');
-    }
+    };
 
-  } catch (error) {
-    // Error state
-    submitBtn.textContent = 'Failed — Try Again';
-    submitBtn.style.background = '#dc2626';
-    submitBtn.style.color = '#fff';
-    submitBtn.disabled = false;
-    setTimeout(() => {
-      submitBtn.textContent = 'Send Message';
-      submitBtn.style.background = '';
-      submitBtn.style.color = '';
-    }, 5000);
-  }
-});
+    xhr.send(JSON.stringify(data));
+  });
 
-// ===== HERO IMAGE LOAD =====
-window.addEventListener('DOMContentLoaded', () => {
-  // Animate hero immediately
-  document.querySelector('.hero-text')?.classList.add('visible');
-  setTimeout(() => document.querySelector('.hero-image-wrap')?.classList.add('visible'), 200);
 });
