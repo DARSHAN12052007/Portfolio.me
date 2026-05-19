@@ -68,12 +68,65 @@ if (heroPhoto) {
   };
 }
 
-// ===== CONTACT FORM — loading state only (real POST handled by FormSubmit) =====
+// ===== CONTACT FORM — Web3Forms (secure, AJAX, spam-protected) =====
 const form = document.getElementById('contactForm');
 const submitBtn = document.getElementById('submitBtn');
-form.addEventListener('submit', () => {
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  // Block bots that filled the honeypot checkbox
+  if (form.querySelector('[name="botcheck"]').checked) return;
+
+  // Basic rate limiting — prevent double-clicks
+  if (submitBtn.disabled) return;
+
   submitBtn.textContent = 'Sending...';
   submitBtn.disabled = true;
+
+  try {
+    const formData = new FormData(form);
+    const payload = Object.fromEntries(formData);
+
+    const response = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      // Success state
+      submitBtn.textContent = 'Message Sent!';
+      submitBtn.style.background = '#059669';
+      submitBtn.style.color = '#fff';
+      form.reset();
+      setTimeout(() => {
+        submitBtn.textContent = 'Send Message';
+        submitBtn.style.background = '';
+        submitBtn.style.color = '';
+        submitBtn.disabled = false;
+      }, 5000);
+    } else {
+      throw new Error(result.message || 'Submission failed');
+    }
+
+  } catch (error) {
+    // Error state
+    submitBtn.textContent = 'Failed — Try Again';
+    submitBtn.style.background = '#dc2626';
+    submitBtn.style.color = '#fff';
+    submitBtn.disabled = false;
+    setTimeout(() => {
+      submitBtn.textContent = 'Send Message';
+      submitBtn.style.background = '';
+      submitBtn.style.color = '';
+    }, 5000);
+  }
 });
 
 // ===== HERO IMAGE LOAD =====

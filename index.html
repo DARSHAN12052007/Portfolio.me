@@ -421,26 +421,30 @@
         </div>
 
         <div class="contact-right">
-          <form class="contact-form" id="contactForm" action="https://formsubmit.co/sandipfulpagare07778@gmail.com" method="POST">
-            <!-- FormSubmit Settings -->
-            <input type="hidden" name="_subject" value="New Portfolio Message from Recruiter!" />
-            <input type="hidden" name="_captcha" value="false" />
-            <input type="hidden" name="_template" value="table" />
-            <input type="hidden" name="_next" value="https://darshan12052007.github.io/Portfolio.me/" />
+          <form class="contact-form" id="contactForm">
+
+            <!-- Web3Forms Access Key -->
+            <input type="hidden" name="access_key" value="e9af55ab-4516-424f-9469-13a4c75b2a26" />
+            <input type="hidden" name="subject" value="New Portfolio Message — Darshan Fulpagar" />
+            <input type="hidden" name="from_name" value="Portfolio Contact Form" />
+
+            <!-- Honeypot: invisible to humans, bots fill this and get blocked -->
+            <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" />
 
             <div class="form-group">
               <label for="nameInput">Name</label>
-              <input type="text" id="nameInput" name="name" placeholder="Your full name" required />
+              <input type="text" id="nameInput" name="name" placeholder="Your full name" required autocomplete="name" />
             </div>
             <div class="form-group">
               <label for="emailInput">Email</label>
-              <input type="email" id="emailInput" name="email" placeholder="your@email.com" required />
+              <input type="email" id="emailInput" name="email" placeholder="your@email.com" required autocomplete="email" />
             </div>
             <div class="form-group">
               <label for="messageInput">Message</label>
               <textarea id="messageInput" name="message" rows="5" placeholder="Tell me about your project or opportunity..." required></textarea>
             </div>
             <button type="submit" class="btn-primary full-width" id="submitBtn">Send Message</button>
+
           </form>
         </div>
       </div>
